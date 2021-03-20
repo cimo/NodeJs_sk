@@ -7,10 +7,13 @@ Starter kit code for web app. Create in a few steps the complete NodeJs project.
 |:---|
 | Cross platform (Windows, Linux, Mac, Android, Ios) |
 
-### Project setup
-```
-npm install
-```
+## Instructions:
+1) Write on terminal:
+
+         cd /home/cimo/nodejs_sk/root
+         sudo cp src/Config.dist.ts src/Config.ts
+         npm install
+         npm run execute
 
 | Library: |
 |:---|
