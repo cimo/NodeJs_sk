@@ -27,4 +27,3 @@ export const data: Interface.Config = {
         key: process.env.NODEJS_CRYPT_KEY
     }
 };
-

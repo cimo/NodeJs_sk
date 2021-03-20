@@ -25,10 +25,7 @@ const httpAuthOption = HttpAuth.digest({
     file: `${Config.data.digest.path}/.digest_htpasswd`
 });
 
-let originList = [
-    `http://${Config.data.socketIo.domain}:${Config.data.port.http}`,
-    `https://${Config.data.socketIo.domain}:${Config.data.port.https}`
-];
+const originList = [`http://${Config.data.socketIo.domain}:${Config.data.port.http}`, `https://${Config.data.socketIo.domain}:${Config.data.port.https}`];
 
 if (Config.data.port.vue) {
     originList.push(`http://${Config.data.socketIo.domain}:${Config.data.port.vue}`);
@@ -38,7 +35,7 @@ if (Config.data.port.range) {
     const portRangeSplit = Config.data.port.range.split("-");
     const portRangeCount = parseInt(portRangeSplit[1]) - parseInt(portRangeSplit[0]);
 
-    for (let i = 0; i <= portRangeCount; i ++) {
+    for (let i = 0; i <= portRangeCount; i++) {
         const port = parseInt(portRangeSplit[0]) + i;
 
         originList.push(`http://${Config.data.socketIo.domain}:${port}`);

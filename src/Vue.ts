@@ -8,8 +8,7 @@ export const startup = (): void => {
         ChildProcess.exec(`vue ui --headless --host ${Config.data.ip} --port ${Config.data.port.vue}`, (error, stdout, stderr) => {
             if (error) {
                 Helper.writeLog(`Vue error => ${error}`);
-            }
-            else {
+            } else {
                 Helper.writeLog(`Vue output => ${stdout} - ${stderr}`);
             }
         });
