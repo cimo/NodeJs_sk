@@ -4,10 +4,9 @@ import * as Http from "http";
 import * as Https from "https";
 import * as BodyParser from "body-parser";
 import CookieParser from "cookie-parser";
-import * as HttpAuth from "http-auth";
 import Cors from "cors";
 import Csrf from "csurf";
-import { Server as ServerIo, Socket as SocketIo } from "socket.io";
+import * as SocketIo from "socket.io";
 
 import * as Config from "./Config";
 import * as Helper from "./Helper";
@@ -20,12 +19,12 @@ const certificate = {
     cert: Fs.readFileSync(Config.data.certificate.cert)
 };
 
-const httpAuthOption = HttpAuth.digest({
-    realm: Config.data.digest.realm,
-    file: `${Config.data.digest.path}/.digest_htpasswd`
-});
-
-const originList = [`http://${Config.data.socketIo.domain}:${Config.data.port.http}`, `https://${Config.data.socketIo.domain}:${Config.data.port.https}`];
+const originList = [
+    `http://${Config.data.socketIo.domain}`,
+    `https://${Config.data.socketIo.domain}`,
+    `http://${Config.data.socketIo.domain}:${Config.data.port.http}`,
+    `https://${Config.data.socketIo.domain}:${Config.data.port.https}`
+];
 
 if (Config.data.port.vue) {
     originList.push(`http://${Config.data.socketIo.domain}:${Config.data.port.vue}`);
@@ -61,14 +60,14 @@ app.use(Csrf({ cookie: true }));
 const serverHttp = Http.createServer(app);
 const serverHttps = Https.createServer(certificate, app);
 
-const socketIoServerHttp = new ServerIo(serverHttp, {
+const socketIoServerHttp = new SocketIo.Server(serverHttp, {
     cors: {
         origin: corsOption.origin,
         methods: corsOption.methods
     },
     cookie: false
 });
-const socketIoServerHttps = new ServerIo(serverHttps, {
+const socketIoServerHttps = new SocketIo.Server(serverHttps, {
     cors: {
         origin: corsOption.origin,
         methods: corsOption.methods
@@ -78,7 +77,7 @@ const socketIoServerHttps = new ServerIo(serverHttps, {
 
 app.get(
     "/",
-    Helper.digestCheck(httpAuthOption, (request, result) => {
+    Helper.digestCheck((request, result) => {
         result.send("");
     })
 );
@@ -95,12 +94,14 @@ serverHttps.listen(portHttps, Config.data.ip, 0, () => {
     Helper.writeLog(`Listen on https://${Config.data.ip}:${Config.data.port.https}`);
 });
 
-socketIoServerHttp.on("connection", (socket: SocketIo) => {
+// noinspection TypeScriptValidateTypes
+socketIoServerHttp.on("connection", (socket: SocketIo.Socket) => {
     Sio.startup(socketIoServerHttp, socket, "http");
 
     Terminal.socketEvent(socket, "http");
 });
-socketIoServerHttps.on("connection", (socket: SocketIo) => {
+// noinspection TypeScriptValidateTypes
+socketIoServerHttps.on("connection", (socket: SocketIo.Socket) => {
     Sio.startup(socketIoServerHttps, socket, "https");
 
     Terminal.socketEvent(socket, "https");

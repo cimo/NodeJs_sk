@@ -3,7 +3,7 @@ import * as Fs from "fs";
 import * as Path from "path";
 import * as Pty from "node-pty";
 import * as ChildProcess from "child_process";
-import { Socket as SocketIo } from "socket.io";
+import * as SocketIo from "socket.io";
 
 import * as Interface from "./Interface";
 import * as Config from "./Config";
@@ -11,7 +11,7 @@ import * as Helper from "./Helper";
 
 const writeStreamEncoding = "utf-8";
 
-const eventPty = (socket: SocketIo): void => {
+const eventPty = (socket: SocketIo.Socket): void => {
     const ptySpawnList = [];
 
     socket.on("t_pty_start", (dataStart: Interface.Socket) => {
@@ -77,7 +77,7 @@ const eventPty = (socket: SocketIo): void => {
     });
 };
 
-const eventExec = (socket: SocketIo): void => {
+const eventExec = (socket: SocketIo.Socket): void => {
     socket.on("t_exec_i", (dataStart: Interface.Socket) => {
         if (dataStart.tag && dataStart.cmd) {
             Helper.writeLog(`Terminal t_exec_i => ${dataStart.tag} - ${dataStart.cmd}`);
@@ -151,7 +151,7 @@ const eventExec = (socket: SocketIo): void => {
     });
 };
 
-const eventCrypt = (socket: SocketIo): void => {
+const eventCrypt = (socket: SocketIo.Socket): void => {
     socket.on("t_crypt_encrypt_i", (dataStart: Interface.Socket) => {
         if (dataStart.tag && (dataStart.text === "" || dataStart.text)) {
             Helper.writeLog(`Execute t_crypt_encrypt_i => ${dataStart.tag} - ${dataStart.text}`);
@@ -169,7 +169,7 @@ const eventCrypt = (socket: SocketIo): void => {
     });
 };
 
-export const socketEvent = (socket: SocketIo, type: string): void => {
+export const socketEvent = (socket: SocketIo.Socket, type: string): void => {
     Helper.writeLog(`Terminal listen on ${type}`);
 
     eventPty(socket);

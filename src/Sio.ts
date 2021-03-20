@@ -1,10 +1,10 @@
-import { Server as ServerIo, Socket as SocketIo } from "socket.io";
+import * as SocketIo from "socket.io";
 
 import * as Helper from "./Helper";
 
 let connectionCount = 0;
 
-const serverTime = (socket: SocketIo): void => {
+const serverTime = (socket: SocketIo.Socket): void => {
     const currentDate = new Date();
 
     let month = currentDate.getMonth() + 1;
@@ -23,14 +23,14 @@ const serverTime = (socket: SocketIo): void => {
     socket.emit("serverTime", `${date} ${time}`);
 };
 
-export const startup = (server: ServerIo, socket: SocketIo, type: string): void => {
+export const startup = (server: SocketIo.Server, socket: SocketIo.Socket, type: string): void => {
     const address = JSON.stringify(socket.handshake.address);
 
     Helper.writeLog(`${address} connected to ${type} server.`);
 
     connectionCount++;
 
-    server.emit("broadcast", `${connectionCount} clients connected to ${type} server.`);
+    server.emit("broadcast", `${connectionCount} clients connected to ${type} server.` as any);
 
     const intervalEvent = setInterval(() => {
         serverTime(socket);
@@ -43,7 +43,7 @@ export const startup = (server: ServerIo, socket: SocketIo, type: string): void 
 
         connectionCount--;
 
-        server.emit("broadcast", `${connectionCount} clients disconnected from ${type} server.`);
+        server.emit("broadcast", `${connectionCount} clients disconnected from ${type} server.` as any);
 
         if (connectionCount === 0) {
             clearInterval(intervalEvent);

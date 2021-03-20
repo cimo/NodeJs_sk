@@ -1,9 +1,15 @@
 import * as Path from "path";
 import * as Fs from "fs";
+import * as HttpAuth from "http-auth";
 import * as Crypto from "crypto";
 
 import * as Interface from "./Interface";
 import * as Config from "./Config";
+
+const httpAuth = HttpAuth.digest({
+    realm: Config.data.digest.realm,
+    file: `${Config.data.digest.path}/.digest_htpasswd`
+});
 
 const cryptAlgorithm = "aes-256-cbc";
 const cryptKey = Crypto.createHash("sha256").update(String(Config.data.crypt.key)).digest("base64").substr(0, 32);
@@ -19,9 +25,9 @@ export const writeLog = (message: string): void => {
     }
 };
 
-export const digestCheck = (digest, callback: Interface.CallbackDigest): Interface.CallbackDigest => {
+export const digestCheck = (callback: Interface.CallbackDigest): Interface.CallbackDigest => {
     if (Config.data.digest.active === "on") {
-        return digest.check((req, res) => {
+        return httpAuth.check((req, res) => {
             callback.apply(this, [req, res]);
         });
     } else {
