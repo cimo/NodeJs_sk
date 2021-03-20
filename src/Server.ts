@@ -13,19 +13,41 @@ import * as Config from "./Config";
 import * as Helper from "./Helper";
 import * as Sio from "./Sio";
 import * as Terminal from "./Terminal";
+import * as Vue from "./Vue";
 
 const certificate = {
-    key: Fs.readFileSync(Config.setting.certificate.key),
-    cert: Fs.readFileSync(Config.setting.certificate.cert)
+    key: Fs.readFileSync(Config.data.certificate.key),
+    cert: Fs.readFileSync(Config.data.certificate.cert)
 };
 
 const httpAuthOption = HttpAuth.digest({
-    realm: Config.setting.digest.realm,
-    file: `${Config.setting.digest.path}/.digest_htpasswd`
+    realm: Config.data.digest.realm,
+    file: `${Config.data.digest.path}/.digest_htpasswd`
 });
 
+let originList = [
+    `http://${Config.data.socketIo.domain}:${Config.data.port.http}`,
+    `https://${Config.data.socketIo.domain}:${Config.data.port.https}`
+];
+
+if (Config.data.port.vue) {
+    originList.push(`http://${Config.data.socketIo.domain}:${Config.data.port.vue}`);
+}
+
+if (Config.data.port.range) {
+    const portRangeSplit = Config.data.port.range.split("-");
+    const portRangeCount = parseInt(portRangeSplit[1]) - parseInt(portRangeSplit[0]);
+
+    for (let i = 0; i <= portRangeCount; i ++) {
+        const port = parseInt(portRangeSplit[0]) + i;
+
+        originList.push(`http://${Config.data.socketIo.domain}:${port}`);
+        originList.push(`https://${Config.data.socketIo.domain}:${port}`);
+    }
+}
+
 const corsOption = {
-    origin: [`http://${Config.setting.socketIo.domain}`],
+    origin: originList,
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
     optionsSuccessStatus: 200
 };
@@ -44,15 +66,15 @@ const serverHttps = Https.createServer(certificate, app);
 
 const socketIoServerHttp = new ServerIo(serverHttp, {
     cors: {
-        origin: [`http://${Config.setting.socketIo.domain}`],
-        methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"]
+        origin: corsOption.origin,
+        methods: corsOption.methods
     },
     cookie: false
 });
 const socketIoServerHttps = new ServerIo(serverHttps, {
     cors: {
-        origin: [`https://${Config.setting.socketIo.domain}`],
-        methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"]
+        origin: corsOption.origin,
+        methods: corsOption.methods
     },
     cookie: false
 });
@@ -64,14 +86,16 @@ app.get(
     })
 );
 
-const portHttp = Config.setting.port.http ? parseInt(Config.setting.port.http) : 0;
-const portHttps = Config.setting.port.https ? parseInt(Config.setting.port.https) : 0;
+const portHttp = Config.data.port.http ? parseInt(Config.data.port.http) : 0;
+const portHttps = Config.data.port.https ? parseInt(Config.data.port.https) : 0;
 
-serverHttp.listen(portHttp, Config.setting.ip, 0, () => {
-    Helper.writeLog(`Listen on http://${Config.setting.ip}:${Config.setting.port.http}`);
+serverHttp.listen(portHttp, Config.data.ip, 0, () => {
+    Helper.writeLog(`Listen on http://${Config.data.ip}:${Config.data.port.http}`);
+
+    Vue.startup();
 });
-serverHttps.listen(portHttps, Config.setting.ip, 0, () => {
-    Helper.writeLog(`Listen on https://${Config.setting.ip}:${Config.setting.port.https}`);
+serverHttps.listen(portHttps, Config.data.ip, 0, () => {
+    Helper.writeLog(`Listen on https://${Config.data.ip}:${Config.data.port.https}`);
 });
 
 socketIoServerHttp.on("connection", (socket: SocketIo) => {

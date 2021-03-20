@@ -1,10 +1,5 @@
 import * as Interface from "./Interface";
 
-process.env.NODEJS_DEBUG = "on";
-process.env.NODEJS_CRYPT_KEY = "abcd1234efgh5678ilmn90";
-process.env.NODEJS_PORT_HTTP = "8009";
-process.env.NODEJS_PORT_HTTPS = "8010";
-
 export const data: Interface.Config = {
     debug: process.env.NODEJS_DEBUG,
     ip: process.env.NODEJS_IP,
@@ -32,3 +27,4 @@ export const data: Interface.Config = {
         key: process.env.NODEJS_CRYPT_KEY
     }
 };
+

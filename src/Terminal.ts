@@ -14,7 +14,7 @@ const writeStreamEncoding = "utf-8";
 const eventPty = (socket: SocketIo): void => {
     const ptySpawnList = [];
 
-    socket.on("t_pty_start", (dataStart: Interface.SocketData) => {
+    socket.on("t_pty_start", (dataStart: Interface.Socket) => {
         if (dataStart.tag) {
             Helper.writeLog(`Terminal ${dataStart.tag} start`);
 
@@ -25,12 +25,12 @@ const eventPty = (socket: SocketIo): void => {
                     name: "xterm-color",
                     cols: dataStart.size[0],
                     rows: dataStart.size[1],
-                    cwd: Config.setting.cwd,
-                    env: Config.setting.env
+                    cwd: Config.data.cwd,
+                    env: Config.data.env
                 });
             }
 
-            ptySpawnList[dataStart.tag].on("data", (data: Interface.SocketData) => {
+            ptySpawnList[dataStart.tag].on("data", (data: Interface.Socket) => {
                 Helper.writeLog(`Terminal t_pty_o_${dataStart.tag} => ${data}`);
 
                 socket.emit(`t_pty_o_${dataStart.tag}`, { tag: dataStart.tag, cmd: data });
@@ -50,7 +50,7 @@ const eventPty = (socket: SocketIo): void => {
         }
     });
 
-    socket.on("t_pty_i", (data: Interface.SocketData) => {
+    socket.on("t_pty_i", (data: Interface.Socket) => {
         if (data.tag && data.cmd && ptySpawnList[data.tag]) {
             Helper.writeLog(`Terminal t_pty_i => ${data.tag} - ${data.cmd}`);
 
@@ -58,7 +58,7 @@ const eventPty = (socket: SocketIo): void => {
         }
     });
 
-    socket.on("t_pty_resize", (data: Interface.SocketData) => {
+    socket.on("t_pty_resize", (data: Interface.Socket) => {
         if (data.tag && data.size && ptySpawnList[data.tag]) {
             Helper.writeLog(`Terminal t_pty_resize => ${data.tag}`);
 
@@ -66,7 +66,7 @@ const eventPty = (socket: SocketIo): void => {
         }
     });
 
-    socket.on("t_pty_close", (data: Interface.SocketData) => {
+    socket.on("t_pty_close", (data: Interface.Socket) => {
         if (data.tag && ptySpawnList[data.tag]) {
             Helper.writeLog(`Terminal t_pty_close => ${data.tag}`);
 
@@ -78,7 +78,7 @@ const eventPty = (socket: SocketIo): void => {
 };
 
 const eventExec = (socket: SocketIo): void => {
-    socket.on("t_exec_i", (dataStart: Interface.SocketData) => {
+    socket.on("t_exec_i", (dataStart: Interface.Socket) => {
         if (dataStart.tag && dataStart.cmd) {
             Helper.writeLog(`Terminal t_exec_i => ${dataStart.tag} - ${dataStart.cmd}`);
 
@@ -108,7 +108,7 @@ const eventExec = (socket: SocketIo): void => {
         }
     });
 
-    socket.on("t_exec_stream_i", (dataStart: Interface.SocketData) => {
+    socket.on("t_exec_stream_i", (dataStart: Interface.Socket) => {
         if (dataStart.tag && dataStart.cmd && dataStart.path) {
             Helper.writeLog(`Terminal t_exec_stream_i => ${dataStart.tag} - ${dataStart.cmd} - ${dataStart.path} - ${dataStart.content}`);
 
@@ -152,7 +152,7 @@ const eventExec = (socket: SocketIo): void => {
 };
 
 const eventCrypt = (socket: SocketIo): void => {
-    socket.on("t_crypt_encrypt_i", (dataStart: Interface.SocketData) => {
+    socket.on("t_crypt_encrypt_i", (dataStart: Interface.Socket) => {
         if (dataStart.tag && (dataStart.text === "" || dataStart.text)) {
             Helper.writeLog(`Execute t_crypt_encrypt_i => ${dataStart.tag} - ${dataStart.text}`);
 
@@ -160,7 +160,7 @@ const eventCrypt = (socket: SocketIo): void => {
         }
     });
 
-    socket.on("t_crypt_decrypt_i", (dataStart: Interface.SocketData) => {
+    socket.on("t_crypt_decrypt_i", (dataStart: Interface.Socket) => {
         if (dataStart.tag && (dataStart.hex === "" || dataStart.hex)) {
             Helper.writeLog(`Execute t_crypt_decrypt_i => ${dataStart.tag} - ${dataStart.hex}`);
 

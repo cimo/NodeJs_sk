@@ -5,15 +5,15 @@ function _typeof(obj) { "@babel/helpers - typeof"; if (typeof Symbol === "functi
 Object.defineProperty(exports, "__esModule", {
   value: true
 });
-exports.decrypt = exports.encrypt = exports.digestCheck = exports.writeLog = void 0;
+exports.decrypt = exports.encrypt = exports.digestCheck = exports.writeLog = exports.urlRoot = void 0;
+
+var Path = _interopRequireWildcard(require("path"));
 
 var Fs = _interopRequireWildcard(require("fs"));
 
 var Crypto = _interopRequireWildcard(require("crypto"));
 
 var Config = _interopRequireWildcard(require("./Config"));
-
-var Env = _interopRequireWildcard(require("./Env"));
 
 var _this = void 0;
 
@@ -22,12 +22,14 @@ function _getRequireWildcardCache() { if (typeof WeakMap !== "function") return 
 function _interopRequireWildcard(obj) { if (obj && obj.__esModule) { return obj; } if (obj === null || _typeof(obj) !== "object" && typeof obj !== "function") { return { "default": obj }; } var cache = _getRequireWildcardCache(); if (cache && cache.has(obj)) { return cache.get(obj); } var newObj = {}; var hasPropertyDescriptor = Object.defineProperty && Object.getOwnPropertyDescriptor; for (var key in obj) { if (Object.prototype.hasOwnProperty.call(obj, key)) { var desc = hasPropertyDescriptor ? Object.getOwnPropertyDescriptor(obj, key) : null; if (desc && (desc.get || desc.set)) { Object.defineProperty(newObj, key, desc); } else { newObj[key] = obj[key]; } } } newObj["default"] = obj; if (cache) { cache.set(obj, newObj); } return newObj; }
 
 var cryptAlgorithm = "aes-256-cbc";
-var cryptKey = Crypto.createHash("sha256").update(String(Env.data.crypt.key)).digest("base64").substr(0, 32);
+var cryptKey = Crypto.createHash("sha256").update(String(Config.data.crypt.key)).digest("base64").substr(0, 32);
 var cryptIv = Crypto.randomBytes(16);
+var urlRoot = "".concat(Path.dirname(__dirname), "/dist");
+exports.urlRoot = urlRoot;
 
 var writeLog = function writeLog(message) {
-  if (Config.setting.debug) {
-    Fs.appendFile("./debug.log", "".concat(message, "\n"), function () {
+  if (Config.data.debug === "on") {
+    Fs.appendFile("".concat(urlRoot, "/debug.log"), "".concat(message, "\n"), function () {
       console.log("writeLog => ".concat(message));
     });
   }
@@ -36,7 +38,7 @@ var writeLog = function writeLog(message) {
 exports.writeLog = writeLog;
 
 var digestCheck = function digestCheck(digest, callback) {
-  if (Config.setting.digest.enabled) {
+  if (Config.data.digest.active === "on") {
     return digest.check(function (req, res) {
       callback.apply(_this, [req, res]);
     });

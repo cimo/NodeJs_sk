@@ -39,8 +39,8 @@ var eventPty = function eventPty(socket) {
           name: "xterm-color",
           cols: dataStart.size[0],
           rows: dataStart.size[1],
-          cwd: Config.setting.cwd,
-          env: Config.setting.env
+          cwd: Config.data.cwd,
+          env: Config.data.env
         });
       }
 

@@ -20,7 +20,9 @@ pnpm-debug.log*
 *.sw?
 
 # cimo +
-src/Env.js
+dist/Config.js
+src/Config.ts
+
 .digest_htpasswd
 .env
 error.log
