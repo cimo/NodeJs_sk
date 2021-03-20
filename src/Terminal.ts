@@ -97,7 +97,7 @@ const eventExec = (socket: SocketIo): void => {
                     socket.emit(`t_exec_o_${dataStart.tag}`, { err: data });
                 });
 
-                if (dataStart.closeEnabled) {
+                if (dataStart.closeActive) {
                     execResult.on("close", (data: string) => {
                         Helper.writeLog(`t_exec_o_${dataStart.tag} => close: ${data}`);
 

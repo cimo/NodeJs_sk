@@ -38,7 +38,7 @@ export interface Socket {
     path?: string;
     hex?: string;
     text?: string;
-    closeEnabled?: boolean;
+    closeActive?: boolean;
 }
 
 export interface CallbackDigest {
