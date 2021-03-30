@@ -10,16 +10,15 @@ const httpAuth = HttpAuth.digest({
     realm: Config.data.digest.realm,
     file: `${Config.data.digest.path}/.digest_htpasswd`
 });
-
 const cryptAlgorithm = "aes-256-cbc";
-const cryptKey = Crypto.createHash("sha256").update(String(Config.data.crypt.key)).digest("base64").substr(0, 32);
-const cryptIv = Crypto.randomBytes(16);
+const cryptKey: string = Crypto.createHash("sha256").update(String(Config.data.crypt.key)).digest("base64").substr(0, 32);
+const cryptIv: Buffer = Crypto.randomBytes(16);
 
-export const urlRoot = `${Path.dirname(__dirname)}/dist`;
+export const pathStatic = `${Path.dirname(__dirname)}${Config.data.pathStatic}`;
 
 export const writeLog = (message: string): void => {
     if (Config.data.debug === "on") {
-        Fs.appendFile(`${urlRoot}/debug.log`, `${message}\n`, () => {
+        Fs.appendFile(`${pathStatic}/debug.log`, `${message}\n`, () => {
             console.log(`writeLog => ${message}`);
         });
     }

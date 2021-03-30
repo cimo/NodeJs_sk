@@ -23,7 +23,7 @@ const serverTime = (socket: SocketIo.Socket): void => {
     socket.emit("serverTime", `${date} ${time}`);
 };
 
-export const startup = (server: SocketIo.Server, socket: SocketIo.Socket, type: string): void => {
+export const startup = async (server: SocketIo.Server, socket: SocketIo.Socket, type: string): Promise<void> => {
     const address = JSON.stringify(socket.handshake.address);
 
     Helper.writeLog(`${address} connected to ${type} server.`);

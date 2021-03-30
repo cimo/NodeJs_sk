@@ -8,23 +8,14 @@ import Cors from "cors";
 import Csrf from "csurf";
 import * as SocketIo from "socket.io";
 
+import * as Interface from "./Interface";
 import * as Config from "./Config";
 import * as Helper from "./Helper";
 import * as Sio from "./Sio";
 import * as Terminal from "./Terminal";
 import * as Vue from "./Vue";
 
-const certificate = {
-    key: Fs.readFileSync(Config.data.certificate.key),
-    cert: Fs.readFileSync(Config.data.certificate.cert)
-};
-
-const originList = [
-    `http://${Config.data.socketIo.domain}`,
-    `https://${Config.data.socketIo.domain}`,
-    `http://${Config.data.socketIo.domain}:${Config.data.port.http}`,
-    `https://${Config.data.socketIo.domain}:${Config.data.port.https}`
-];
+const originList = [`http://${Config.data.socketIo.domain}`, `https://${Config.data.socketIo.domain}`, `http://${Config.data.socketIo.domain}:${Config.data.port.http}`, `https://${Config.data.socketIo.domain}:${Config.data.port.https}`];
 
 if (Config.data.port.vue) {
     originList.push(`http://${Config.data.socketIo.domain}:${Config.data.port.vue}`);
@@ -42,38 +33,19 @@ if (Config.data.port.range) {
     }
 }
 
-const corsOption = {
+const corsOption: Interface.Cors = {
     origin: originList,
     methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
     optionsSuccessStatus: 200
 };
 
 const app = Express();
-
-app.use(Express.static(Helper.urlRoot));
+app.use(Express.static(Helper.pathStatic));
 app.use(BodyParser.urlencoded({ extended: false }));
 app.use(BodyParser.json());
 app.use(CookieParser());
 app.use(Cors(corsOption));
 app.use(Csrf({ cookie: true }));
-
-const serverHttp = Http.createServer(app);
-const serverHttps = Https.createServer(certificate, app);
-
-const socketIoServerHttp = new SocketIo.Server(serverHttp, {
-    cors: {
-        origin: corsOption.origin,
-        methods: corsOption.methods
-    },
-    cookie: false
-});
-const socketIoServerHttps = new SocketIo.Server(serverHttps, {
-    cors: {
-        origin: corsOption.origin,
-        methods: corsOption.methods
-    },
-    cookie: false
-});
 
 app.get(
     "/",
@@ -81,6 +53,36 @@ app.get(
         result.send("");
     })
 );
+
+const serverHttp = Http.createServer(app);
+const serverHttps = Https.createServer(
+    {
+        key: Fs.readFileSync(Config.data.certificate.key),
+        cert: Fs.readFileSync(Config.data.certificate.cert)
+    },
+    app
+);
+
+const socketIoServerHttp = new SocketIo.Server(serverHttp, {
+    cors: {
+        origin: corsOption.origin,
+        methods: corsOption.methods
+    },
+    transports: ["websocket"],
+    pingTimeout: 60000,
+    pingInterval: 8000,
+    cookie: false
+});
+const socketIoServerHttps = new SocketIo.Server(serverHttps, {
+    cors: {
+        origin: corsOption.origin,
+        methods: corsOption.methods
+    },
+    transports: ["websocket"],
+    pingTimeout: 60000,
+    pingInterval: 8000,
+    cookie: false
+});
 
 const portHttp = Config.data.port.http ? parseInt(Config.data.port.http) : 0;
 const portHttps = Config.data.port.https ? parseInt(Config.data.port.https) : 0;
@@ -96,13 +98,13 @@ serverHttps.listen(portHttps, Config.data.ip, 0, () => {
 
 // noinspection TypeScriptValidateTypes
 socketIoServerHttp.on("connection", (socket: SocketIo.Socket) => {
-    Sio.startup(socketIoServerHttp, socket, "http");
+    Terminal.socketEvent(socket, "http").then(() => {});
 
-    Terminal.socketEvent(socket, "http");
+    Sio.startup(socketIoServerHttp, socket, "http").then(() => {});
 });
 // noinspection TypeScriptValidateTypes
 socketIoServerHttps.on("connection", (socket: SocketIo.Socket) => {
-    Sio.startup(socketIoServerHttps, socket, "https");
+    Terminal.socketEvent(socket, "https").then(() => {});
 
-    Terminal.socketEvent(socket, "https");
+    Sio.startup(socketIoServerHttps, socket, "https").then(() => {});
 });

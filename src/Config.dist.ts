@@ -3,6 +3,7 @@ import * as Interface from "./Interface";
 export const data: Interface.Config = {
     debug: process.env.NODEJS_DEBUG,
     ip: process.env.NODEJS_IP,
+    pathStatic: process.env.NODEJS_PATH_STATIC,
     cwd: process.env.HOME,
     env: process.env,
     socketIo: {

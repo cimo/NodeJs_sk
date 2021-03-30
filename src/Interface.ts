@@ -1,6 +1,7 @@
 export interface Config {
     debug: string | undefined;
     ip: string | undefined;
+    pathStatic: string | undefined;
     cwd: string | undefined;
     env: any | undefined;
     socketIo: {
@@ -39,6 +40,12 @@ export interface Socket {
     hex?: string;
     text?: string;
     closeActive?: boolean;
+}
+
+export interface Cors {
+    origin: string[];
+    methods: string[];
+    optionsSuccessStatus: number;
 }
 
 export interface CallbackDigest {

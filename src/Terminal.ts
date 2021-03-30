@@ -9,11 +9,10 @@ import * as Interface from "./Interface";
 import * as Config from "./Config";
 import * as Helper from "./Helper";
 
+const ptySpawnList: Pty.IPty[] = [];
 const writeStreamEncoding = "utf-8";
 
 const eventPty = (socket: SocketIo.Socket): void => {
-    const ptySpawnList = [];
-
     socket.on("t_pty_start", (dataStart: Interface.Socket) => {
         if (dataStart.tag) {
             Helper.writeLog(`Terminal ${dataStart.tag} start`);
@@ -169,7 +168,7 @@ const eventCrypt = (socket: SocketIo.Socket): void => {
     });
 };
 
-export const socketEvent = (socket: SocketIo.Socket, type: string): void => {
+export const socketEvent = async (socket: SocketIo.Socket, type: string): Promise<void> => {
     Helper.writeLog(`Terminal listen on ${type}`);
 
     eventPty(socket);
