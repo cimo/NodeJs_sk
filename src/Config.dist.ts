@@ -24,7 +24,8 @@ export const data: Interface.Config = {
         path: `/home/${process.env.WWW_USER_NAME}/root${process.env.WEB_PATH}`,
         active: process.env.NODEJS_DIGEST
     },
-    crypt: {
-        key: process.env.NODEJS_CRYPT_KEY
+    encryption: {
+        secret: process.env.NODEJS_ENCRYPTION_SECRET,
+        key: process.env.NODEJS_ENCRYPTION_KEY
     }
 };

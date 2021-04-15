@@ -22,7 +22,8 @@ export interface Config {
         path: string;
         active: string | undefined;
     };
-    crypt: {
+    encryption: {
+        secret: string | undefined;
         key: string | undefined;
     };
 }
