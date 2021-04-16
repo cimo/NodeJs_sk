@@ -6,6 +6,7 @@ Starter kit code for web app. Create in a few steps the complete NodeJs project.
 | Info: |
 |:---|
 | Cross platform (Windows, Linux, Mac, Android, Ios) |
+| NodeJs version: 14.16.0 |
 
 ## Instructions:
 1) Write on terminal:

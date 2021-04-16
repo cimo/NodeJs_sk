@@ -4,16 +4,15 @@ module.exports = {
         browser: true,
         node: true
     },
-    parser: "@typescript-eslint/parser",
-    plugins: ["@typescript-eslint", "prettier"],
-    extends: ["eslint:recommended", "plugin:@typescript-eslint/eslint-recommended", "plugin:@typescript-eslint/recommended", "prettier"],
     parserOptions: {
         ecmaVersion: 2020
     },
+    parser: "@typescript-eslint/parser",
+    plugins: ["@typescript-eslint", "prettier"],
+    extends: ["eslint:recommended", "plugin:@typescript-eslint/recommended", "prettier"],
     rules: {
         "no-console": process.env.NODE_ENV === "production" ? "warn" : "off",
         "no-debugger": process.env.NODE_ENV === "production" ? "warn" : "off",
-        curly: ["error"],
         "object-curly-spacing": "off",
         "sort-imports": "off",
         "no-unused-vars": "off",
@@ -42,6 +41,7 @@ module.exports = {
                 useTabs: false,
                 vueIndentScriptAndStyle: true
             }
-        ]
+        ],
+        curly: ["error"]
     }
 };
