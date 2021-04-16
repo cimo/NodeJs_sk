@@ -69,7 +69,7 @@ export const decrypt = (hex: string): string => {
         const cryptIv = encryption();
 
         if (cryptIv) {
-            const decipher = Crypto.createDecipheriv(cryptAlgorithm, cryptKey, Buffer.from(cryptIv.toString(), "hex"));
+            const decipher = Crypto.createDecipheriv(cryptAlgorithm, cryptKey, Buffer.from(cryptIv));
             const decrypted = Buffer.concat([decipher.update(Buffer.from(hex, "hex")), decipher.final()]);
 
             return decrypted.toString();
