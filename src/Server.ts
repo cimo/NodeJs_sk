@@ -2,12 +2,11 @@ import * as Fs from "fs";
 import Express from "express";
 import * as Http from "http";
 import * as Https from "https";
-import * as BodyParser from "body-parser";
 import CookieParser from "cookie-parser";
 import Cors from "cors";
 import Csrf from "csurf";
 import * as SocketIo from "socket.io";
-
+// Source
 import * as Interface from "./Interface";
 import * as Config from "./Config";
 import * as Helper from "./Helper";
@@ -34,17 +33,23 @@ if (Config.data.port.range) {
 }
 
 const corsOption: Interface.Cors = {
-    origin: originList,
-    methods: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
+    originList: originList,
+    methodList: ["GET", "HEAD", "PUT", "PATCH", "POST", "DELETE"],
     optionsSuccessStatus: 200
 };
 
 const app = Express();
 app.use(Express.static(Helper.pathStatic));
-app.use(BodyParser.urlencoded({ extended: false }));
-app.use(BodyParser.json());
+app.use(Express.urlencoded({ extended: true }));
+app.use(Express.json());
 app.use(CookieParser());
-app.use(Cors(corsOption));
+app.use(
+    Cors({
+        origin: corsOption.originList,
+        methods: corsOption.methodList,
+        optionsSuccessStatus: corsOption.optionsSuccessStatus
+    })
+);
 app.use(Csrf({ cookie: true }));
 
 app.get(
@@ -65,8 +70,8 @@ const serverHttps = Https.createServer(
 
 const socketIoServerHttp = new SocketIo.Server(serverHttp, {
     cors: {
-        origin: corsOption.origin,
-        methods: corsOption.methods
+        origin: corsOption.originList,
+        methods: corsOption.methodList
     },
     transports: ["websocket"],
     pingTimeout: 60000,
@@ -75,8 +80,8 @@ const socketIoServerHttp = new SocketIo.Server(serverHttp, {
 });
 const socketIoServerHttps = new SocketIo.Server(serverHttps, {
     cors: {
-        origin: corsOption.origin,
-        methods: corsOption.methods
+        origin: corsOption.originList,
+        methods: corsOption.methodList
     },
     transports: ["websocket"],
     pingTimeout: 60000,

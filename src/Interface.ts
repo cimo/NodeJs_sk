@@ -35,7 +35,7 @@ export interface Socket {
     err?: string;
     close?: string | number;
     chunk?: string;
-    size?: number[];
+    sizeList?: number[];
     content?: string;
     path?: string;
     hex?: string;
@@ -44,8 +44,8 @@ export interface Socket {
 }
 
 export interface Cors {
-    origin: string[];
-    methods: string[];
+    originList: string[];
+    methodList: string[];
     optionsSuccessStatus: number;
 }
 
