@@ -8,7 +8,7 @@ import * as Config from "./Config";
 
 const httpAuth = HttpAuth.digest({
     realm: Config.data.digest.realm,
-    file: `${Config.data.digest.path}/.digest_htpasswd`
+    file: `${Config.data.digest.path}.digest_htpasswd`
 });
 const cryptAlgorithm = "aes-256-cbc";
 const cryptKey: string = Crypto.createHash("sha256").update(String(Config.data.encryption.secret)).digest("base64").substr(0, 32);
